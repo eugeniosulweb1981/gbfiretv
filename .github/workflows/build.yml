@@ -21,8 +21,13 @@ jobs:
         run: |
           curl -L -o gradle-8.6-bin.zip https://services.gradle.org/distributions/gradle-8.6-bin.zip
           unzip -q gradle-8.6-bin.zip
-      - name: Build Debug APK
-        run: ./gradle-8.6/bin/gradle --no-daemon --stacktrace assembleDebug
+    - name: Build Debug APK (robust)
+  env:
+    GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g -Dorg.gradle.internal.http.retry=5 -Dorg.gradle.internal.network.retry.max.attempts=5"
+  run: |
+    ./gradle-8.6/bin/gradle --version
+    ./gradle-8.6/bin/gradle --no-daemon --stacktrace --info --refresh-dependencies assembleDebug
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
